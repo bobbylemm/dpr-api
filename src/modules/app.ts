@@ -1,6 +1,8 @@
 import express, { Request, Response, NextFunction } from 'express';
 import cors from "cors";
 
+import { sequelize } from '../db/models'
+
 const app = express();
 
 app.use(express.urlencoded({ extended: true }));
@@ -8,16 +10,22 @@ app.use(express.json());
 
 app.use(cors());
 
+sequelize.authenticate()
+    .then(() => console.log('Connected to DB!!'))
+    .catch((error) => {
+        throw error
+    })
+
 app.get('*', function (req, res, next) {
-  const error = { statusCode: 301 };
- 
-  next(error);
+    const error = { statusCode: 301 };
+
+    next(error);
 });
 
 app.use((error: any, req: Request, res: Response, next: NextFunction) => {
-    if(!error.statusCode) error.statusCode = 500
+    if (!error.statusCode) error.statusCode = 500
 
-    if(error.statusCode == 301) {
+    if (error.statusCode == 301) {
         return res.status(301).json({
             message: 'This route does not exist'
         })
