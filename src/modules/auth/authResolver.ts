@@ -3,15 +3,13 @@ import {
     Mutation,
     Arg,
     Ctx,
-    ObjectType,
-    Field
+    Query,
 } from "type-graphql";
 
 import { MyContext } from "../../shared/types";
 import User from '../../schemas/User'
 import AuthRepo from "./authRepository";
 import { AuthRegisterInput, AuthLoginInput } from "./authInput";
-import FieldError from "../../schemas/FieldError";
 
 @Resolver(User)
 export class AuthResolver {
@@ -32,6 +30,8 @@ export class AuthResolver {
         } catch (err) {
             console.log(err, 'error')
         }
+        req.session!.userId = user.id
+
         return user
     }
 
@@ -47,6 +47,14 @@ export class AuthResolver {
             console.log(err, 'err')
         }
 
+        req.session!.userId = user.id
         return user;
+    }
+
+    @Query(() => User, {})
+    async me (@Ctx() { req }: MyContext) {
+        if (!req.session!.userId) return null
+
+        return await this.repo.getUserById(req.session!.userId)
     }
 }

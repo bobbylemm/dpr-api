@@ -31,6 +31,7 @@ const main = async () => {
     const SequelizeStore = connectSessionSeq(session.Store);
     const sessionStore = new SequelizeStore({
         db: sequelize,
+
     })
     sessionStore.sync()
     
@@ -38,9 +39,16 @@ const main = async () => {
         session({
             secret: "dpr secret",
             store: sessionStore,
-            saveUninitialized: true,
+            saveUninitialized: false,
             resave: false,
-            proxy: true
+            proxy: true,
+            name: 'qid',
+            cookie: {
+                maxAge: 24 * 60 * 60 * 1000,
+                httpOnly: true,
+                secure: false,
+                sameSite: "lax"
+            }
         })
     );
 

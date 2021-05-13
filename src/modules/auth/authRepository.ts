@@ -4,7 +4,7 @@ import UserModel from '../../db/models/user'
 import { AuthRegisterInput, AuthLoginInput } from "./authInput";
 
 export default class AuthRepo {
-    async register(payload: AuthRegisterInput) {
+    async register (payload: AuthRegisterInput) {
         const { name, password, email } = payload
         const hashedPassword = await argon2.hash(password);
         try {
@@ -14,7 +14,7 @@ export default class AuthRepo {
         }
     }
 
-    async login(payload: AuthLoginInput) {
+    async login (payload: AuthLoginInput) {
         const { password, email } = payload
         try {
             const user = await UserModel.findOne({ where: { email } })
@@ -33,6 +33,14 @@ export default class AuthRepo {
             if (!valid) throw error
 
             return user
+        } catch (error) {
+            throw error
+        }
+    }
+
+    async getUserById (id: number) {
+        try {
+            return await UserModel.findOne({ where: { id } })
         } catch (error) {
             throw error
         }

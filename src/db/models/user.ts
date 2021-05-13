@@ -48,7 +48,7 @@ const User = sequelize.define<UserInstance>(
 
 User.hasMany(Post, {
     sourceKey: 'id',
-    foreignKey: 'postId',
+    foreignKey: 'userId',
     as: 'posts'
 });
 
