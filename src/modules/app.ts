@@ -1,36 +1,68 @@
-import express, { Request, Response, NextFunction } from 'express';
+import express, {Express} from 'express';
 import cors from "cors";
+import { ApolloServer } from "apollo-server-express";
+import { buildSchema } from "type-graphql";
+import session from 'express-session';
+import connectSessionSeq from 'connect-session-sequelize'
+
+import { AuthResolver } from "../modules/auth/authResolver";
+import { PostResolver } from "../modules/post/postResolver";
+
 
 import { sequelize } from '../db/models'
 
-const app = express();
+let app: Express;
 
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
+const main = async () => {
 
-app.use(cors());
+    app = express();
 
-sequelize.authenticate()
-    .then(() => console.log('Connected to DB!!'))
-    .catch((error) => {
-        throw error
-    })
+    app.use(express.urlencoded({ extended: true }));
+    app.use(express.json());
 
-app.get('*', function (req, res, next) {
-    const error = { statusCode: 301 };
+    app.use(cors());
 
-    next(error);
-});
-
-app.use((error: any, req: Request, res: Response, next: NextFunction) => {
-    if (!error.statusCode) error.statusCode = 500
-
-    if (error.statusCode == 301) {
-        return res.status(301).json({
-            message: 'This route does not exist'
+    sequelize.authenticate()
+        .then(() => console.log('Connected to DB!!'))
+        .catch((error) => {
+            throw error
         })
-    }
-    return res.status(500).json({ error: 'Server Error' });
+
+    const SequelizeStore = connectSessionSeq(session.Store);
+    const sessionStore = new SequelizeStore({
+        db: sequelize,
+    })
+    sessionStore.sync()
+    
+    app.use(
+        session({
+            secret: "dpr secret",
+            store: sessionStore,
+            saveUninitialized: true,
+            resave: false,
+            proxy: true
+        })
+    );
+
+    const apolloServer = new ApolloServer({
+        schema: await buildSchema({
+            resolvers: [AuthResolver, PostResolver],
+            validate: false,
+        }),
+        context: ({ req, res }) => ({
+            req,
+            res,
+        }),
+    });
+
+    apolloServer.applyMiddleware({
+        app,
+        cors: false,
+    });
+}
+
+main().catch((err) => {
+    console.error(err);
 });
 
 export default app;

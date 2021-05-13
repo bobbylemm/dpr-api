@@ -17,8 +17,8 @@ interface UserAttributes {
 interface UserCreationAttributes extends Optional<UserAttributes, "id"> { }
 
 interface UserInstance extends Model<UserAttributes, UserCreationAttributes>, UserAttributes {
-    createdAt?: Date;
-    updatedAt?: Date;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 const User = sequelize.define<UserInstance>(

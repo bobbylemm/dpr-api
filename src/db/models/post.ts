@@ -15,8 +15,8 @@ interface PostAttributes {
 interface PostCreationAttributes extends Optional<PostAttributes, "id"> { }
 
 interface PostInstance extends Model<PostAttributes, PostCreationAttributes>, PostAttributes {
-    createdAt?: Date;
-    updatedAt?: Date;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 const Post = sequelize.define<PostInstance>(
