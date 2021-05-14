@@ -20,7 +20,13 @@ const main = async () => {
     app.use(express.urlencoded({ extended: true }));
     app.use(express.json());
 
-    app.use(cors());
+    var corsOptions = {
+        origin: 'http://localhost:1234',
+        credentials: true
+      };
+      
+    app.use(cors(corsOptions));
+      
 
     sequelize.authenticate()
         .then(() => console.log('Connected to DB!!'))
@@ -65,7 +71,7 @@ const main = async () => {
 
     apolloServer.applyMiddleware({
         app,
-        cors: false,
+        cors: corsOptions,
     });
 }
 

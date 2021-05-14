@@ -8,7 +8,7 @@ class Post {
   @Field(() => String, { nullable: true })
   title: string;
   
-  @Field(() => Date, { nullable: true })
+  @Field(() => String, { nullable: true })
   createdAt: Date;
 
   @Field(() => Date, { nullable: true })
