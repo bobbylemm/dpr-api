@@ -22,11 +22,11 @@ export class PostResolver {
     async posts(@Ctx() { req }: MyContext): Promise<Post[]> {
         let posts;
         try {
+            if (!req.session!.userId) return []
             posts = await this.repo.getAll(req.session!.userId)
         } catch (err) {
             console.log(err, 'err')
         }
-        console.log(posts, 'posts')
         return posts
     }
 

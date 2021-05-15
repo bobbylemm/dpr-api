@@ -57,4 +57,19 @@ export class AuthResolver {
 
         return await this.repo.getUserById(req.session!.userId)
     }
+
+    @Mutation(() => Boolean)
+    logout(@Ctx() { req, res }: MyContext) {
+        return new Promise((resolve) =>
+            req.session.destroy((err) => {
+                res.clearCookie("qid");
+                if (err) {
+                    console.log(err);
+                    resolve(false);
+                    return;
+                }
+                resolve(true);
+            })
+        );
+    }
 }
